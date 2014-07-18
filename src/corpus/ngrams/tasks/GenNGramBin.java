@@ -16,6 +16,15 @@ import flib.util.io.enums.EFileType;
 public class GenNGramBin {
 	public static Pattern WNPtn = Pattern.compile("[a-zA-Z0-9]+");
 	public static Pattern FHeadPtn = Pattern.compile("^['\"#$%^&+-~!]");
+	
+	public static boolean Filter(String t1)
+	{
+		if(t1.startsWith("<") && t1.endsWith(">")) return false;
+		if(WNPtn.matcher(t1).find()) return false;
+		if(FHeadPtn.matcher(t1).find()) return false;
+		return true;
+	}
+	
 	public static boolean Filter(String t1, String t2)
 	{
 		if(t1.startsWith("<") && t1.endsWith(">")) return false;
@@ -107,6 +116,24 @@ public class GenNGramBin {
 		return null;
 	}
 	
+	public static void DumpUBean(File dir, UGramBean tb)
+	{
+		File cDir = new File(dir, String.valueOf(tb.getHead().toCharArray()[0]));
+		cDir.mkdirs();
+		File tbFile = new File(cDir, tb.getHead());
+		try
+		{
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tbFile));
+			oos.writeObject(tb);
+			oos.close();
+		}
+		catch(Exception e)
+		{
+			System.err.printf("\t[Error] Fail to serialize UGramBean:'%s'!\n", tb.getHead());
+			e.printStackTrace();
+		}
+	}
+	
 	public static void DumpBean(File dir, TermBean tb)
 	{
 		File cDir = new File(dir, String.valueOf(tb.getHead().toCharArray()[0]));
@@ -159,10 +186,19 @@ public class GenNGramBin {
 			else qsr.reopen(gz);
 			
 			TermBean bean=null;
+			UGramBean ubean = null;
 			for(String line:qsr)
 			{
 				String items[] = line.split("[\t ]");		/*Term1<Space>Term2<Tag>Freq*/
-				if(items.length==3)
+				if(items.length==2)
+				{
+					if(Filter(items[0]))
+					{
+						ubean = new UGramBean(items[0], Long.valueOf(items[1]));
+						DumpUBean(tmpDir, ubean);
+					}
+				}
+				else if(items.length==3)
 				{
 					if(Filter(items[0], items[1]))
 					{

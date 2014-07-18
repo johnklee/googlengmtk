@@ -21,6 +21,7 @@ import flib.util.os.MonitorServiceImpl;
 public class GGAgent implements IGGA{
 	File 						workDir;
 	HashMap<String,TermBean> 	cacheMap = new HashMap<String,TermBean>();
+	HashMap<String,UGramBean>	uCacheMap = new HashMap<String,UGramBean>();
 	HashSet<String>				missCache = new HashSet<String>();
 	int 						roundCheck=1000;							/*Every 1000 times calling in pairFreq(), will call optimizeCache().*/
 	int							piCnt=0;
@@ -83,6 +84,7 @@ public class GGAgent implements IGGA{
 	public void optimizeCache(String t1, String t2){}
 	
 	public void updatePI(String t1, String t2, boolean bHit){}
+	public void updatePI(String t1, boolean bHit){}
 	
 	public int pairFreq(String t1, String t2)
 	{
@@ -150,7 +152,7 @@ public class GGAgent implements IGGA{
 		}
 	}
 
-	public void freeCache(){cacheMap.clear();missCache.clear();}
+	public void freeCache(){cacheMap.clear();missCache.clear();uCacheMap.clear();}
 	
 	/**
 	 * @param args
@@ -176,5 +178,21 @@ public class GGAgent implements IGGA{
 			st = System.currentTimeMillis();
 		}
 		System.out.printf("\t[Test] Done! %s\n", TimeStr.ToStringFrom(gst));
+	}
+
+	@Override
+	public long count(String t1) {
+		UGramBean bean = uCacheMap.get(t1);
+		if(bean==null)
+		{
+			bean = loadUBean(t1);
+			if(bean==null) {
+				missCache.add(String.format("%s", t1));
+				updatePI(t1, false);
+				return -1;
+			}
+			else uCacheMap.put(t1, bean);			
+		}		
+		return bean.getCount();
 	}
 }
