@@ -22,6 +22,39 @@ public class GenNGramBin {
 		if(FHeadPtn.matcher(t1).find()) return false;
 		return true;
 	}
+	
+	public static boolean Filter(String t1, String t2, String t3)
+	{
+		if(t1.startsWith("<") && t1.endsWith(">")) return false;
+		if(WNPtn.matcher(t1).find() && 
+		   WNPtn.matcher(t2).find() &&
+		   WNPtn.matcher(t3).find()) return false;
+		if(FHeadPtn.matcher(t1).find()) return false;
+		return true;
+	}
+	
+	public static boolean Filter(String t1, String t2, String t3, String t4)
+	{
+		if(t1.startsWith("<") && t1.endsWith(">")) return false;
+		if(WNPtn.matcher(t1).find() && 
+		   WNPtn.matcher(t2).find() &&
+		   WNPtn.matcher(t3).find() &&
+		   WNPtn.matcher(t4).find()) return false;
+		if(FHeadPtn.matcher(t1).find()) return false;
+		return true;
+	}
+	
+	public static boolean Filter(String t1, String t2, String t3, String t4, String t5)
+	{
+		if(t1.startsWith("<") && t1.endsWith(">")) return false;
+		if(WNPtn.matcher(t1).find() && 
+		   WNPtn.matcher(t2).find() &&
+		   WNPtn.matcher(t3).find() &&
+		   WNPtn.matcher(t4).find() &&
+		   WNPtn.matcher(t5).find()) return false;
+		if(FHeadPtn.matcher(t1).find()) return false;
+		return true;
+	}
 
 	public static TermBean LoadBean(File dir, String head)
 	{
@@ -65,15 +98,23 @@ public class GenNGramBin {
 		}
 	}
 	
+	public static String MergeTail(String ...ts)
+	{
+		StringBuffer tailBuf = new StringBuffer();
+		tailBuf.append(ts[0]);
+		for(int i=1; i<ts.length; i++) tailBuf.append(String.format("\t%s", ts[i]));
+		return tailBuf.toString();
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception{
 		long st = System.currentTimeMillis();
-		File tmpDir = new File("tmpdir");
+		File tmpDir = new File("C:/WorkingHouse/Google/GNGWdir/5g");
 		
 		QSReader qsr = null;
-		File googleNGramSrc = new File("C:/WorkingHouse/Google/data/2-bigrams/");
+		File googleNGramSrc = new File("C:/WorkingHouse/Google/data/5-fourgrams/");
 		int fc=0;
 		int gc=0;
 		int pmt=-1;
@@ -93,7 +134,7 @@ public class GenNGramBin {
 			TermBean bean=null;
 			for(String line:qsr)
 			{
-				String items[] = line.split("[\t ]");		/*Term1|Term2|Freq*/
+				String items[] = line.split("[\t ]");		/*Term1<Space>Term2<Tag>Freq*/
 				if(items.length==3)
 				{
 					if(Filter(items[0], items[1]))
@@ -110,6 +151,66 @@ public class GenNGramBin {
 							}
 						}
 						bean.getTails().put(items[1], Integer.valueOf(items[2]));
+						gc++;
+					}
+				}
+				else if(items.length==4)
+				{
+					// 3gram
+					if(Filter(items[0], items[1], items[2]))
+					{
+						//System.out.printf("%s -> %s (%d)\n", items[0], items[1], Integer.valueOf(items[2]));
+						if(bean==null || !bean.getHead().equals(items[0]))
+						{
+							if(bean!=null) DumpBean(tmpDir, bean);
+							bean = LoadBean(tmpDir, items[0]);
+							if(bean==null)
+							{
+								bean = new TermBean();
+								bean.setHead(items[0]);
+							}
+						}
+						bean.getTails().put(MergeTail(items[1], items[2]), Integer.valueOf(items[3]));
+						gc++;
+					}
+				}
+				else if(items.length==5)
+				{
+					// 4gram
+					if(Filter(items[0], items[1], items[2], items[3]))
+					{
+						//System.out.printf("%s -> %s (%d)\n", items[0], items[1], Integer.valueOf(items[2]));
+						if(bean==null || !bean.getHead().equals(items[0]))
+						{
+							if(bean!=null) DumpBean(tmpDir, bean);
+							bean = LoadBean(tmpDir, items[0]);
+							if(bean==null)
+							{
+								bean = new TermBean();
+								bean.setHead(items[0]);
+							}
+						}
+						bean.getTails().put(MergeTail(items[1], items[2], items[3]), Integer.valueOf(items[4]));
+						gc++;
+					}
+				}
+				else if(items.length==6)
+				{
+					// 5gram
+					if(Filter(items[0], items[1], items[2], items[3], items[4]))
+					{
+						//System.out.printf("%s -> %s (%d)\n", items[0], items[1], Integer.valueOf(items[2]));
+						if(bean==null || !bean.getHead().equals(items[0]))
+						{
+							if(bean!=null) DumpBean(tmpDir, bean);
+							bean = LoadBean(tmpDir, items[0]);
+							if(bean==null)
+							{
+								bean = new TermBean();
+								bean.setHead(items[0]);
+							}
+						}
+						bean.getTails().put(MergeTail(items[1], items[2], items[3], items[4]), Integer.valueOf(items[5]));
 						gc++;
 					}
 				}

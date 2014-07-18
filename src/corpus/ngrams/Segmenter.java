@@ -82,7 +82,7 @@ public class Segmenter {
 				if(w==null) w = (float)0;
 				float current_weight = prev_weight+w;
 				
-				System.out.printf("\t%s->%.02f...", current_word, current_weight);
+				//System.out.printf("\t%s->%.02f...", current_word, current_weight);
 				// update the path
 				/*if (!exists($prev[$j]) || $best_prob[$j] > $current_weight) {
 			        $prev[$j] = $i;
@@ -92,9 +92,9 @@ public class Segmenter {
 				{
 					prev.put(j, i);
 					best_prob.put(j, current_weight);
-					System.out.printf("Yes!");
+					//System.out.printf("Yes!");
 				}
-				System.out.println();
+				//System.out.println();
 			} // for(int j=i+1; j<text_len; j++)					
 		} // for(int i=0; i<text_len; i++)
 		
@@ -111,8 +111,7 @@ public class Segmenter {
 			{
 				k--;
 			}
-		}
-		System.out.printf("\t[Test] Boundaries size=%d...\n", boundaries.size());
+		}		
 		
 		// fill the result string
 		StringBuffer result = new StringBuffer();
