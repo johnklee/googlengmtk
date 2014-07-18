@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.util.regex.Pattern;
 
 import corpus.ngrams.bean.TermBean;
+import corpus.ngrams.bean.UGramBean;
 import flib.util.TimeStr;
 import flib.util.io.QSReader;
 import flib.util.io.enums.EFileType;
@@ -80,6 +81,32 @@ public class GenNGramBin {
 		}
 		return null;
 	}
+	
+	public static UGramBean LoadUBean(File dir, String head)
+	{
+		File cDir = new File(dir, String.valueOf(head.toCharArray()[0]));
+		if(cDir.exists())
+		{
+			File tbFile = new File(cDir, head);
+			if(tbFile.exists())
+			{
+				try
+				{
+					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tbFile));
+					UGramBean bean = (UGramBean)ois.readObject();
+					ois.close();
+					return bean;
+				}
+				catch(Exception e)
+				{
+					System.err.printf("\t[Error] Fail to deserialize TermBean:'%s'!\n", head);
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+	
 	public static void DumpBean(File dir, TermBean tb)
 	{
 		File cDir = new File(dir, String.valueOf(tb.getHead().toCharArray()[0]));
@@ -111,10 +138,10 @@ public class GenNGramBin {
 	 */
 	public static void main(String[] args) throws Exception{
 		long st = System.currentTimeMillis();
-		File tmpDir = new File("C:/WorkingHouse/Google/GNGWdir/5g");
+		File tmpDir = new File("C:/WorkingHouse/Google/GNGWdir/1g");
 		
 		QSReader qsr = null;
-		File googleNGramSrc = new File("C:/WorkingHouse/Google/data/5-fourgrams/");
+		File googleNGramSrc = new File("C:/WorkingHouse/Google/data/1-unigram/");
 		int fc=0;
 		int gc=0;
 		int pmt=-1;

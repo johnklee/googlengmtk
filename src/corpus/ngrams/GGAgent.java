@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.PriorityQueue;
 
 import corpus.ngrams.bean.TermBean;
+import corpus.ngrams.bean.UGramBean;
 import corpus.ngrams.inst.IGGA;
 import flib.util.TimeStr;
 import flib.util.Tuple;
@@ -47,6 +48,31 @@ public class GGAgent implements IGGA{
 				catch(Exception e)
 				{
 					System.err.printf("\t[Error] Fail to deserialize TermBean:'%s'!\n", head);
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+	
+	public UGramBean loadUBean(String head)
+	{
+		File cDir = new File(workDir, String.valueOf(head.toCharArray()[0]));
+		if(cDir.exists())
+		{
+			File tbFile = new File(cDir, head);
+			if(tbFile.exists())
+			{
+				try
+				{
+					ObjectInputStream ois = new ObjectInputStream(new FileInputStream(tbFile));
+					UGramBean bean = (UGramBean)ois.readObject();
+					ois.close();
+					return bean;
+				}
+				catch(Exception e)
+				{
+					System.err.printf("\t[Error] Fail to deserialize UGramBean:'%s'!\n", head);
 					e.printStackTrace();
 				}
 			}
