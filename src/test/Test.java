@@ -83,11 +83,23 @@ public class Test {
         qsr.close();
 	}
 	
+	public static void UniGram() throws Exception
+	{
+		File workDir = new File("wdir/1g"); // Working directory
+		IGGA agent = new GGAgent(workDir);
+		String cases[] = {"千千百百", "千千萬萬", "千不存在"};
+		for(String t:cases)
+		{
+			System.out.printf("\t[Info] %s->%d\n", t, agent.count(t));
+		}
+		agent.freeCache();
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception 
 	{
-		FiveGram();	
+		UniGram();	
 	}
 }
